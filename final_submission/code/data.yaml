@@ -1,0 +1,36 @@
+path: /kaggle/working/data
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: AdjustableClamp
+  1: AdjustableWrench
+  2: Battery
+  3: Bolt
+  4: BoltNutSet
+  5: BoltWasher
+  6: ClampPart
+  7: Cutter
+  8: FuelCap
+  9: Hammer
+  10: Hose
+  11: Label
+  12: LuggagePart
+  13: LuggageTag
+  14: MetalPart
+  15: MetalSheet
+  16: Nail
+  17: Nut
+  18: PaintChip
+  19: Pen
+  20: PlasticPart
+  21: Pliers
+  22: Rock
+  23: Screw
+  24: Screwdriver
+  25: SodaCan
+  26: Tape
+  27: Washer
+  28: Wire
+  29: Wood
+  30: Wrench
