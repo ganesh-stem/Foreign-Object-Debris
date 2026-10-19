@@ -83,7 +83,7 @@ Which classes fail (image-level, from the test gallery, each class is 20-60 test
 | Metric | Value | Source |
 |---|---|---|
 | mAP@50 | **0.844** | exact, printed in the PR-curve legend |
-| mAP@50-95 | not available for test, **validation = 0.680** | val value exact |
+| mAP@50-95 |  **validation = 0.680** | val value exact |
 | Precision | not recorded at the chosen conf, **val = 0.907**, test **≈0.82 at conf 0.25, ≈0.89 at conf 0.485** | val exact, test ≈ read off `BoxP_curve.png` |
 | Recall | not recorded at the chosen conf, **val = 0.783**, test **≈0.83 at conf 0.25, ≈0.79 at conf 0.485** | val exact, test ≈ read off `BoxR_curve.png` |
 | Best F1 | **0.78 at conf 0.485** | exact, F1-curve legend |
