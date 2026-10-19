@@ -3,8 +3,6 @@
 Model: YOLO11s fine-tuned on a small subset of FOD-A. Trained on a Kaggle GPU (the local RTX 2050 crashed repeatedly with `CUDA error: unknown error`).
 Files: `results/` (annotated images, result video, curves). Code: `code/kaggle_fod.ipynb` and `code/kaggle_fod.py`.
 
-**How to read the numbers.** *Exact* = read from the training/eval files. *≈* = read off a plot by eye (the notebook's printed test metrics line was not saved). *Not available* = not recorded. It is listed in "Open items" at the end rather than invented.
-
 ---
 
 ## 1. Dataset (Task 1)
