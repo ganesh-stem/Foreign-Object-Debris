@@ -115,6 +115,6 @@ This is a recall-biased operating point chosen from the curves. For a certificat
 6. **MLOps loop:** confirmed alerts and false alarms feed back as new labelled data and hard negatives. Periodic retraining with versioned models and per-condition (weather/light/altitude) monitoring for drift.
 
 ## Open items (not hidden)
-- Test mAP@50-95, test precision/recall at the chosen conf and exact TP/FP/FN instance counts were printed in the Kaggle notebook but not saved. Pasting the printed lines (cells 2, 4, 5) would replace the "≈" values above with exact ones.
+- Test mAP@50-95, test precision/recall at the chosen conf and exact TP/FP/FN instance counts were printed in the Kaggle notebook but not saved. 
 - No altitude or weather experiment. No runway-like negatives. The model is under-trained and uses a 12 % subset.
 - Labels were not manually audited.
