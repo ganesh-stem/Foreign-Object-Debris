@@ -9,7 +9,7 @@ Files: `results/` (annotated images, result video, curves). Code: `code/kaggle_f
 
 ## 1. Dataset (Task 1)
 
-**FOD-A v2.1, Pascal VOC release** (Munyer et al. 2021, github.com/FOD-UNOmaha/FOD-data).
+**FOD-A v2.1, Pascal VOC release** (github.com/FOD-UNOmaha/FOD-data).
 - 33,793 images, **31 object classes** (tools, fasteners, luggage parts, wire, rock, wood, soda can …), 300×300 px, one bounding box per object. Light-level (bright/dim/dark) and wet/dry weather tags exist as separate files. I did not use them in this run.
 - **Quality / imbalance observed in EDA** (`results/eda.png`):
   - *Imbalance:* in the used subset the most common class (Bolt) has ≈400 instances and the rarest (Screw, FuelCap) ≈80, a 5:1 spread.
