@@ -27,7 +27,7 @@ Files: `results/` (annotated images, result video, curves). Code: `code/kaggle_f
 | Image size | 512 | Source images are 300×300, 512 (~1.7× upsample) keeps tiny objects visible at lower cost than 640 |
 | Epochs / batch | 15 (early stop 6) / 32 | Time budget on a free GPU. Validation mAP was still creeping up at epoch 15, so the model is **under-trained** |
 | Optimiser | AdamW, lr 1e-3, cosine decay | Stable fine-tuning |
-| Augmentation | HSV jitter (h 0.015, s 0.6, v 0.5), rotation ±15°, flips (up-down and left-right), scale 0.6, translate 0.1, mosaic (off for last 3 epochs), mixup 0.1, small perspective | HSV → lighting / time-of-day / weather, flips + rotation → a UAV looking down has no canonical "up", scale → different flight altitudes / zoom, mosaic/mixup → more object contexts and regularisation on a tiny dataset |
+| Augmentation | HSV jitter (h 0.015, s 0.6, v 0.5), rotation ±15°, flips (up-down and left-right), scale 0.6, translate 0.1, mosaic (off for last 3 epochs), mixup 0.1, small perspective | HSV -> lighting / time-of-day / weather, flips + rotation -> a UAV looking down has no canonical "up", scale -> different flight altitudes / zoom, mosaic/mixup -> more object contexts and regularisation on a tiny dataset |
 | Caching | RAM | Remove CPU image-decoding bottleneck |
 
 Training curves: `results/results.png`. Final epoch, **validation** set (exact, from `results.csv`): precision **0.907**, recall **0.783**, mAP@50 **0.854**, mAP@50-95 **0.680**.
@@ -41,10 +41,10 @@ Image-level tally over the 780 test images (a miss takes priority over a false a
 | # | Image | What it shows |
 |---|---|---|
 | 1 | `1_TP_pliers.jpg` | Correct detection, Pliers 0.89 |
-| 2 | `2_FP_wire_duplicate_boxes.jpg` | Wire found, but extra overlapping/partial boxes → false positives |
+| 2 | `2_FP_wire_duplicate_boxes.jpg` | Wire found, but extra overlapping/partial boxes -> false positives |
 | 3 | `3_FP_shoe_unlabelled.jpg` | A shoe at the frame edge is detected, it is a real unlabelled object |
 | 4 | `4_FN_rock_missed.jpg` | Rock, no box at all (true miss) |
-| 5 | `5_FN_screw_tiny_wrong_class.jpg` | Very small Screw, predicted as ClampPart → counts as FP + FN |
+| 5 | `5_FN_screw_tiny_wrong_class.jpg` | Very small Screw, predicted as ClampPart -> counts as FP + FN |
 | 6 | `6_FN_paintchip_class_confusion.jpg` | PaintChip localised correctly but labelled PlasticPart (0.73) |
 
 ## 4. Error analysis (Task 4)
@@ -55,7 +55,7 @@ Which classes fail (image-level, from the test gallery, each class is 20-60 test
 - **About 20 classes were perfect** at this threshold (e.g. Pliers, Wrench, Hammer, Cutter, Battery, Nail, Wood).
 
 **Why the misses happened (from the images):**
-1. **Wrong class, not missing object (dominant).** In images 5 and 6 the box is in the right place but the label is wrong (PaintChip→PlasticPart, Screw→ClampPart). The confusion matrix (`confusion_matrix_normalized.png`) shows the same: heavy off-diagonal mass between visually similar classes (e.g. Cutter↔AdjustableWrench, Hose↔Wood, PaintChip↔MetalSheet, Rock↔SodaCan). Likely causes: **very few training examples per class (~100) from a few video segments**, and classes that look alike in 300×300 crops (dark flat fragments, metal pieces). Test blocks are *different video segments*, so the model has not seen those viewpoints. (This is my interpretation of the images and matrix, I did not run an ablation to prove it.)
+1. **Wrong class, not missing object (dominant).** In images 5 and 6 the box is in the right place but the label is wrong (PaintChip->PlasticPart, Screw->ClampPart). The confusion matrix (`confusion_matrix_normalized.png`) shows the same: heavy off-diagonal mass between visually similar classes (e.g. Cutter↔AdjustableWrench, Hose↔Wood, PaintChip↔MetalSheet, Rock↔SodaCan). Likely causes: **very few training examples per class (~100) from a few video segments**, and classes that look alike in 300×300 crops (dark flat fragments, metal pieces). Test blocks are *different video segments*, so the model has not seen those viewpoints. (This is my interpretation of the images and matrix, I did not run an ablation to prove it.)
 2. **Small size.** The Screw is a few pixels wide. At 300 px source resolution there is little detail to classify.
 3. **Truncation at the frame edge** (the ClampPart example is cut by the border).
 4. **Rare / hard classes** (Rock, Screw, FuelCap have the fewest instances). Rock is a *true* miss: low contrast, brown-grey on grey concrete, texture similar to the background.
@@ -87,7 +87,7 @@ Which classes fail (image-level, from the test gallery, each class is 20-60 test
 | Precision | not recorded at the chosen conf, **val = 0.907**, test **≈0.82 at conf 0.25, ≈0.89 at conf 0.485** | val exact, test ≈ read off `BoxP_curve.png` |
 | Recall | not recorded at the chosen conf, **val = 0.783**, test **≈0.83 at conf 0.25, ≈0.79 at conf 0.485** | val exact, test ≈ read off `BoxR_curve.png` |
 | Best F1 | **0.78 at conf 0.485** | exact, F1-curve legend |
-| Maximum recall (conf → 0) | **≈0.89** | R-curve legend |
+| Maximum recall (conf -> 0) | **≈0.89** | R-curve legend |
 
 Figures (all in `results/`): PR curve `BoxPR_curve.png`, F1 `BoxF1_curve.png`, precision/recall-confidence `BoxP_curve.png`, `BoxR_curve.png`, confusion matrix `confusion_matrix_normalized.png`.
 
@@ -95,7 +95,7 @@ Figures (all in `results/`): PR curve `BoxPR_curve.png`, F1 `BoxF1_curve.png`, p
 
 **Chosen confidence threshold: 0.25** for the safety use case (a deliberate departure from the F1-optimal 0.485):
 - F1 is nearly flat between ≈0.2 and ≈0.6, so lowering to 0.25 costs very little F1.
-- recall rises from ≈0.79 to ≈0.83 (+~4 points) at the price of precision ≈0.89 → ≈0.82.
+- recall rises from ≈0.79 to ≈0.83 (+~4 points) at the price of precision ≈0.89 -> ≈0.82.
 - below ≈0.15 recall barely improves but precision falls steeply, so the false-alarm burden grows fast.
 - the extra false alarms are handled downstream (N-of-M frames, tracking, operator check), as described in §4.
 This is a recall-biased operating point chosen from the curves. For a certification-grade claim it should be set on validation data against a target recall (e.g. ≥0.95 for hazardous classes), which this model cannot yet reach.
@@ -107,7 +107,7 @@ This is a recall-biased operating point chosen from the curves. For a certificat
 
 1. **Sensing:** gimbal-stabilised RGB camera (add thermal/IR for night and fog), flying a planned low-altitude sweep along the runway. GPS/RTK + IMU for geotagging. Altitude is chosen so the smallest hazardous object spans a minimum number of pixels (this dataset's tiny-object problem means the ground sampling distance must be specified up front).
 2. **Onboard compute:** Jetson Orin-class module. Export the model to **TensorRT FP16/INT8**. Tiled/sliced inference for small objects. Target ≥10-15 FPS.
-3. **Pipeline:** capture → preprocess → class-agnostic FOD detector → tracker (e.g. ByteTrack) → temporal filter (alert only after N of M frames) → classifier on the crop → geo-projection of the box to runway coordinates using camera pose + altitude.
+3. **Pipeline:** capture -> preprocess -> class-agnostic FOD detector -> tracker (e.g. ByteTrack) -> temporal filter (alert only after N of M frames) -> classifier on the crop -> geo-projection of the box to runway coordinates using camera pose + altitude.
 4. **Comms / ground station:** alert with crop, class, confidence and map position over a datalink (LTE/5G/telemetry) to the airport operations dashboard. Operator confirms and dispatches ground crew. All evidence logged.
 5. **Safety & ops:** recall-biased thresholds with human in the loop. Geofencing and ATC coordination. Battery / return-to-home failsafes. Fall back to manual inspection when conditions are outside the model's validated range (night, fog, heavy rain).
 6. **MLOps loop:** confirmed alerts and false alarms feed back as new labelled data and hard negatives. Periodic retraining with versioned models and per-condition (weather/light/altitude) monitoring for drift.
