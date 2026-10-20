@@ -15,9 +15,9 @@ Code: `code/kaggle_fod.ipynb` and `code/kaggle_fod.py`.
 **FOD-A v2.1, Pascal VOC release** (github.com/FOD-UNOmaha/FOD-data).
 - 33,793 images, **31 object classes** (tools, fasteners, luggage parts, wire, rock, wood, soda can …), 300×300 px, one bounding box per object. Light-level (bright/dim/dark) and wet/dry weather tags exist as separate files. I did not use them in this run.
 - **Quality / imbalance observed in EDA** (`results/eda.png`):
-  - *Imbalance:* in the used subset the most common class (Bolt) has ≈400 instances and the rarest (Screw, FuelCap) ≈80, a 5:1 spread.
-  - *Tiny objects:* the box-area histogram is dominated by very small boxes. On the full set ≈27 % of boxes cover <1 % of the image.
-  - *Mostly one object per frame* (≈98 % of images), always on a plain concrete/asphalt surface, usually centred.
+  - *Imbalance:* in the used subset the most common class (Bolt) has about 400 instances and the rarest (Screw, FuelCap) about 80, a 5:1 spread.
+  - *Tiny objects:* the box-area histogram is dominated by very small boxes. On the full set about 27 % of boxes cover <1 % of the image.
+  - *Mostly one object per frame* (about 98 % of images), always on a plain concrete/asphalt surface, usually centred.
   - *Near-duplicates:* frames are video frames, so consecutive images are almost identical.
   - Cleaning: dropped unreadable images, exact (MD5) duplicates, boxes <2 px or outside the frame, images with no valid box. On the data I checked locally the script found **no** such defects (0 removed), so the labels are structurally clean. Label *correctness* was not audited by hand.
 - **Subset:** to fit the time budget I used **12 % of each class's frame blocks** (`FRAC=0.12`, **4,420 images**, all 31 classes).
@@ -29,7 +29,7 @@ Code: `code/kaggle_fod.ipynb` and `code/kaggle_fod.py`.
 | Setting | Value | Why |
 |---|---|---|
 | Model | YOLO11s, COCO-pretrained | Transfer learning suits a small dataset, small enough for a Jetson-class onboard computer |
-| Image size | 512 | Source images are 300×300, 512 (~1.7× upsample) keeps tiny objects visible at lower cost than 640 |
+| Image size | 512 | Source images are 300×300, 512 (approx. 1.7× upsample) keeps tiny objects visible at lower cost than 640 |
 | Epochs / batch | 15 (early stop 6) / 32 | Time budget on a free GPU. Validation mAP was still creeping up at epoch 15, so the model is **under-trained** |
 | Optimiser | AdamW, lr 1e-3, cosine decay | Stable fine-tuning |
 | Augmentation | HSV jitter (h 0.015, s 0.6, v 0.5), rotation ±15°, flips (up-down and left-right), scale 0.6, translate 0.1, mosaic (off for last 3 epochs), mixup 0.1, small perspective | HSV -> lighting / time-of-day / weather, flips + rotation -> a UAV looking down has no canonical "up", scale -> different flight altitudes / zoom, mosaic/mixup -> more object contexts and regularisation on a tiny dataset |
@@ -60,7 +60,7 @@ Which classes fail (image-level, from the test gallery, each class is 20-60 test
 - **About 20 classes were perfect** at this threshold (e.g. Pliers, Wrench, Hammer, Cutter, Battery, Nail, Wood).
 
 **Why the misses happened (from the images):**
-1. **Wrong class, not missing object (dominant).** In images 5 and 6 the box is in the right place but the label is wrong (PaintChip->PlasticPart, Screw->ClampPart). The confusion matrix (`confusion_matrix_normalized.png`) shows the same: heavy off-diagonal mass between visually similar classes (e.g. Cutter<->AdjustableWrench, Hose<->Wood, PaintChip<->MetalSheet, Rock<->SodaCan). Likely causes: **very few training examples per class (~100) from a few video segments**, and classes that look alike in 300×300 crops (dark flat fragments, metal pieces). Test blocks are *different video segments*, so the model has not seen those viewpoints. (This is my interpretation of the images and matrix, I did not run an ablation to prove it.)
+1. **Wrong class, not missing object (dominant).** In images 5 and 6 the box is in the right place but the label is wrong (PaintChip->PlasticPart, Screw->ClampPart). The confusion matrix (`confusion_matrix_normalized.png`) shows the same: heavy off-diagonal mass between visually similar classes (e.g. Cutter<->AdjustableWrench, Hose<->Wood, PaintChip<->MetalSheet, Rock<->SodaCan). Likely causes: **very few training examples per class (approx. 100) from a few video segments**, and classes that look alike in 300×300 crops (dark flat fragments, metal pieces). Test blocks are *different video segments*, so the model has not seen those viewpoints. (This is my interpretation of the images and matrix, I did not run an ablation to prove it.)
 2. **Small size.** The Screw is a few pixels wide. At 300 px source resolution there is little detail to classify.
 3. **Truncation at the frame edge** (the ClampPart example is cut by the border).
 4. **Rare / hard classes** (Rock, Screw, FuelCap have the fewest instances). Rock is a *true* miss: low contrast, brown-grey on grey concrete, texture similar to the background.
@@ -89,19 +89,19 @@ Which classes fail (image-level, from the test gallery, each class is 20-60 test
 |---|---|---|
 | mAP@50 | **0.844** | exact, printed in the PR-curve legend |
 | mAP@50-95 |  **validation = 0.680** | val value exact |
-| Precision | not recorded at the chosen conf, **val = 0.907**, test **≈0.82 at conf 0.25, ≈0.89 at conf 0.485** | val exact, test ≈ read off `BoxP_curve.png` |
-| Recall | not recorded at the chosen conf, **val = 0.783**, test **≈0.83 at conf 0.25, ≈0.79 at conf 0.485** | val exact, test ≈ read off `BoxR_curve.png` |
+| Precision | not recorded at the chosen conf, **val = 0.907**, test **about 0.82 at conf 0.25, about 0.89 at conf 0.485** | val exact, test values read off `BoxP_curve.png` by eye |
+| Recall | not recorded at the chosen conf, **val = 0.783**, test **about 0.83 at conf 0.25, about 0.79 at conf 0.485** | val exact, test values read off `BoxR_curve.png` by eye |
 | Best F1 | **0.78 at conf 0.485** | exact, F1-curve legend |
-| Maximum recall (conf -> 0) | **≈0.89** | R-curve legend |
+| Maximum recall (conf -> 0) | **about 0.89** | R-curve legend |
 
 Figures (all in `results/`): PR curve `BoxPR_curve.png`, F1 `BoxF1_curve.png`, precision/recall-confidence `BoxP_curve.png`, `BoxR_curve.png`, confusion matrix `confusion_matrix_normalized.png`.
 
-**Reading the curves.** The mean PR curve is high and flat (precision ≈0.9 up to recall ≈0.7) and drops only near recall ≈0.9, but the thin grey per-class lines show a handful of classes with very poor curves (the same ClampPart / Rock / Screw / PaintChip group). The recall curve tops out near **0.89 even at confidence 0**, so ≈11 % of test objects are never found-and-classified correctly at any threshold. **lowering the threshold cannot fix those, only more data or a class-agnostic detector can.**
+**Reading the curves.** The mean PR curve is high and flat (precision about 0.9 up to recall about 0.7) and drops only near recall about 0.9, but the thin grey per-class lines show a handful of classes with very poor curves (the same ClampPart / Rock / Screw / PaintChip group). The recall curve tops out near **0.89 even at confidence 0**, so about 11 % of test objects are never found-and-classified correctly at any threshold. **lowering the threshold cannot fix those, only more data or a class-agnostic detector can.**
 
 **Chosen confidence threshold: 0.25** for the safety use case (a deliberate departure from the F1-optimal 0.485):
-- F1 is nearly flat between ≈0.2 and ≈0.6, so lowering to 0.25 costs very little F1.
-- recall rises from ≈0.79 to ≈0.83 (+~4 points) at the price of precision ≈0.89 -> ≈0.82.
-- below ≈0.15 recall barely improves but precision falls steeply, so the false-alarm burden grows fast.
+- F1 is nearly flat between about 0.2 and about 0.6, so lowering to 0.25 costs very little F1.
+- recall rises from about 0.79 to about 0.83 (about 4 points higher) at the price of precision about 0.89 -> about 0.82.
+- below about 0.15 recall barely improves but precision falls steeply, so the false-alarm burden grows fast.
 - the extra false alarms are handled downstream (N-of-M frames, tracking, operator check), as described in §4.
 This is a recall-biased operating point chosen from the curves. For a certification-grade claim it should be set on validation data against a target recall (e.g. ≥0.95 for hazardous classes), which this model cannot yet reach.
 
@@ -118,6 +118,5 @@ This is a recall-biased operating point chosen from the curves. For a certificat
 6. **MLOps loop:** confirmed alerts and false alarms feed back as new labelled data and hard negatives. Periodic retraining with versioned models and per-condition (weather/light/altitude) monitoring for drift.
 
 ## Open items (not hidden)
-- Test mAP@50-95, test precision/recall at the chosen conf and exact TP/FP/FN instance counts were printed in the Kaggle notebook but not saved. 
 - No altitude or weather experiment. No runway-like negatives. The model is under-trained and uses a 12 % subset.
 - Labels were not manually audited.
