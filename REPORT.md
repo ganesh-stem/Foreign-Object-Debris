@@ -1,7 +1,12 @@
 # Foreign Object Debris (FOD) Detection Report
 
-Model: YOLO11s fine-tuned on a small subset of FOD-A. Trained on a Kaggle GPU (the local RTX 2050 crashed repeatedly with `CUDA error: unknown error`).
-Files: `results/` (annotated images, result video, curves). Code: `code/kaggle_fod.ipynb` and `code/kaggle_fod.py`.
+Model: YOLO11s fine-tuned on a small subset of FOD-A. 
+
+Trained on a Kaggle GPU (the local RTX 2050 crashed repeatedly with `CUDA error: unknown error`).
+
+Files: `results/` (annotated images, result video, curves). 
+
+Code: `code/kaggle_fod.ipynb` and `code/kaggle_fod.py`.
 
 ---
 
